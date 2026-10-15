@@ -1,4 +1,4 @@
-# data/ — raw measurements / mesures brutes
+# data/ : raw measurements / mesures brutes
 
 | File | What it is |
 |---|---|

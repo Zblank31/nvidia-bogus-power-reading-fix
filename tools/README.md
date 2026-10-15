@@ -1,4 +1,4 @@
-# tools/ — measurement tools / outils de mesure
+# tools/ : measurement tools / outils de mesure
 
 No CUDA toolkit needed: `make` (a C compiler is enough). They load `libcuda` at run time and run a PTX kernel of fused multiply-adds, so they work on any Volta-or-newer NVIDIA GPU with the driver installed.
 
