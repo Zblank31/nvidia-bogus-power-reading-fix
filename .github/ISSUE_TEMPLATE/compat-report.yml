@@ -1,6 +1,6 @@
 name: Compatibility report / Rapport de compatibilité
 description: Tell us whether the workaround worked (or not) on your card / Dis-nous si le contournement a marché (ou non) sur ta carte
-title: "[report] <GPU model> — works / does not work"
+title: "[report] <GPU model> - works / does not work"
 labels: ["compat-report"]
 body:
   - type: markdown
