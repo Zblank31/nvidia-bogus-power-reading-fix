@@ -1,0 +1,25 @@
+# Example plan for reload-trials.sh.      Format:  name|registry setting for the card under test|optional command(s)
+#   - the setting is what goes after "pci=<address>;" in NVreg_RegistryDwordsPerDevice (several keys: KEY=VALUE;KEY=VALUE)
+#   - commands: "lgc=min,max" / "lmc=min,max" lock the GPU / memory clock during the load ; "idle" = idle-only probe (~25 s)
+#   - consecutive lines with the SAME setting do not reload the driver (they are sub-measurements)
+# This is the plan that was run on the RTX 3080 LHR of this repository; the series stopped at trial 1 (the fix).
+0_reference|
+1_pmgrpmu_1|RmPmgrPmuOverride=1
+1b_force_p0_alone|RMForcePstate=0
+1c_perflevelsrc_2222_alone|PerfLevelSrc=0x2222
+# RmPerfLimitsOverride=2 lifts the power cap but freezes the card in P8 (see ../docs/how-it-works.md): kept here as a counter-example
+2_O2|RmPerfLimitsOverride=2
+2b_O2_lgc1000|RmPerfLimitsOverride=2|lgc=1000,1000
+2c_O2_lgc1700_lmc|RmPerfLimitsOverride=2|lgc=1700,1700 lmc=9251,9501
+3_O2_force_p0|RmPerfLimitsOverride=2;RMForcePstate=0
+4_O2_force_p2|RmPerfLimitsOverride=2;RMForcePstate=2
+5_O2_perflevelsrc_2222|RmPerfLimitsOverride=2;PerfLevelSrc=0x2222
+6_O2_perflevelsrc_3333|RmPerfLimitsOverride=2;PerfLevelSrc=0x3333
+7_O2_dynpstate_0|RmPerfLimitsOverride=2;DisableDynamicPstate=0
+8_O2_dynpstate_1|RmPerfLimitsOverride=2;DisableDynamicPstate=1
+9_O2_asyncpstates_0|RmPerfLimitsOverride=2;DisableAsyncPstates=0
+10_O2_asyncpstates_1|RmPerfLimitsOverride=2;DisableAsyncPstates=1
+11_O2_disablepstates_0|RmPerfLimitsOverride=2;RMDisablePStates=0
+12_O2_extperfcontrol_0|RmPerfLimitsOverride=2;RMExtPerfControl=0
+13_psucap_0|RMEnablePowerSupplyCapacity=0
+14_pmgrpmu_1_force_p0|RmPmgrPmuOverride=1;RMForcePstate=0

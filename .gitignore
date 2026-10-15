@@ -1,0 +1,12 @@
+# built tools
+tools/gpuload
+tools/sondeclk
+# never commit firmware, BIOS dumps or driver binaries
+*.rom
+*.bin
+*.fw
+*.zst
+# local run results
+research/runs/
+__pycache__/
+*.tmp

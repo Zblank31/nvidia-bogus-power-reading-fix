@@ -1,0 +1,13 @@
+# sondeclk, 4 launches, taken on 2026-10-15 right after the fix was active (GPU 0 = healthy twin, GPU 1 = the fixed card)
+## GPU 0
+NVIDIA GeForce RTX 3080: 68 SMs, compute capability 8.6, advertised max clock 1710 MHz, memory 9501 MHz on 320 bits, L2 5120 KiB
+launch 1: 0.305 s; real SM clock: mean 1710 MHz (min 1709, median 1710, max 1710); results checksum c1a800a176215af3
+launch 2: 0.269 s; real SM clock: mean 1930 MHz (min 1909, median 1935, max 1938); results checksum c1a800a176215af3
+launch 3: 0.264 s; real SM clock: mean 1932 MHz (min 1928, median 1933, max 1935); results checksum c1a800a176215af3
+launch 4: 0.267 s; real SM clock: mean 1930 MHz (min 1928, median 1931, max 1933); results checksum c1a800a176215af3
+## GPU 1
+NVIDIA GeForce RTX 3080: 68 SMs, compute capability 8.6, advertised max clock 1710 MHz, memory 9501 MHz on 320 bits, L2 5120 KiB
+launch 1: 0.337 s; real SM clock: mean 1366 MHz (min 1361, median 1366, max 1370); results checksum c1a800a176215af3
+launch 2: 0.338 s; real SM clock: mean 1365 MHz (min 1359, median 1365, max 1371); results checksum c1a800a176215af3
+launch 3: 0.344 s; real SM clock: mean 1335 MHz (min 1332, median 1335, max 1340); results checksum c1a800a176215af3
+launch 4: 0.344 s; real SM clock: mean 1336 MHz (min 1333, median 1335, max 1341); results checksum c1a800a176215af3

@@ -1,0 +1,51 @@
+name: Compatibility report / Rapport de compatibilité
+description: Tell us whether the workaround worked (or not) on your card / Dis-nous si le contournement a marché (ou non) sur ta carte
+title: "[report] <GPU model> — works / does not work"
+labels: ["compat-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Negative reports are as useful as positive ones. / Merci ! Les rapports négatifs sont aussi utiles que les positifs.
+        Run `scripts/diagnostic.sh` **before** the fix (idle, then under load) and paste its output below. It prints no serial number or UUID.
+  - type: input
+    id: gpu
+    attributes:
+      label: Card (brand, model, PCI ID) / Carte (marque, modèle, identifiant PCI)
+      placeholder: "GALAX RTX 3080 LHR 10 GB, 10de:2216"
+    validations: {required: true}
+  - type: dropdown
+    id: used
+    attributes:
+      label: Was the card used for mining? / La carte a-t-elle servi au minage ?
+      options: ["Yes / Oui", "No / Non", "Don't know / Je ne sais pas"]
+    validations: {required: true}
+  - type: input
+    id: system
+    attributes:
+      label: Distribution, kernel, driver version / Distribution, noyau, version du pilote
+      placeholder: "Ubuntu 26.04, 7.0.0-38-generic, 615.71.09 (open modules)"
+    validations: {required: true}
+  - type: textarea
+    id: before
+    attributes:
+      label: Output of `scripts/diagnostic.sh` BEFORE the fix / Sortie de `diagnostic.sh` AVANT le correctif
+      render: text
+    validations: {required: true}
+  - type: dropdown
+    id: wall
+    attributes:
+      label: Did you confirm with a wall power meter that the reading is bogus? / As-tu confirmé avec un wattmètre que la lecture est fausse ?
+      options: ["Yes / Oui", "No / Non"]
+    validations: {required: true}
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result of the fix / Résultat du correctif
+      options: ["Works: the card leaves 210 MHz / Ça marche", "Option received but the card is still stuck / Option reçue mais toujours bloquée", "Option not received / Option non reçue", "Other / Autre"]
+    validations: {required: true}
+  - type: textarea
+    id: after
+    attributes:
+      label: Output of `scripts/verify.sh` AFTER the fix, and anything else (temperatures, wall power, `tools/sondeclk`) / Sortie de `verify.sh` APRÈS le correctif, et le reste
+      render: text

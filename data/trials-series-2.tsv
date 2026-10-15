@@ -1,0 +1,11 @@
+trial	name	setting	received_by_driver	idle_W_read	fan_pct	idle_clock_MHz	load_W_read	load_clock_avg_MHz	load_clock_max_MHz	TFLOPS	sw_power_cap_active_pct	status
+0	0_reference	(none)	-	392	50	210	421	210	210	3.43	100	no effect
+1	1a_RatedTdp_0	RmPerfRatedTdpLimit=0	yes	400	50	210	420	210	210	3.41	100	no effect
+2	1b_RatedTdp_1	RmPerfRatedTdpLimit=1	yes	400	50	210	420	210	210	3.40	100	no effect
+3	2_DisablePerfIntersect	RMDisablePerfIntersect=1	yes	402	50	210	421	210	210	3.44	100	no effect
+4	3_PerfLimits_all_1	RmPerfLimitsOverride=85	yes	395	50	210	421	210	210	3.46	100	no effect
+5	4_PerfLimits_all_2	RmPerfLimitsOverride=170	yes	389	50	420	407	420	420	6.93	0	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+6	5_UseSwI2c	RMUseSwI2c=1	yes	401	50	210	421	210	210	3.42	100	no effect
+7	6_UsePmuSwI2c	RMUsePmuSwI2c=1	yes	401	50	210	420	210	210	3.42	100	no effect
+8	7_ForceLockedClocks	RMForceLockedClocksMode=1	yes	397	50	210	420	210	210	3.42	100	no effect
+9	8_IsenseCheckIgnore	RmPmgrIsenseCheckIgnore=1	yes	401	50	210	421	210	210	3.42	100	no effect

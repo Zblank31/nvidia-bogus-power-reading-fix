@@ -1,0 +1,14 @@
+trial	name	setting	received_by_driver	idle_W_read	fan_pct	idle_clock_MHz	load_W_read	load_clock_avg_MHz	load_clock_max_MHz	TFLOPS	sw_power_cap_active_pct	pstate_under_load	clock_event_reasons_hex	status
+0	0_reference	(none)	-	391	50	210	420	210	210	3.43	100	P2	0x0000000000000004	no effect
+1	1_170_repro	RmPerfLimitsOverride=170	yes	390	50	420	408	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+2	2_field0_only	RmPerfLimitsOverride=2	yes	389	50	420	407	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+3	3_field1_only	RmPerfLimitsOverride=8	yes	400	50	210	420	210	210	3.42	100	P2	0x0000000000000004	no effect
+4	4_field2_only	RmPerfLimitsOverride=32	yes	402	50	210	422	210	210	3.42	100	P2	0x0000000000000004	no effect
+5	5_field3_only	RmPerfLimitsOverride=128	yes	398	50	210	421	210	210	3.42	100	P2	0x0000000000000004	no effect
+6	6_170_minus_field0	RmPerfLimitsOverride=168	yes	401	50	210	421	210	210	3.42	100	P2	0x0000000000000004	no effect
+7	7_170_minus_field1	RmPerfLimitsOverride=162	yes	389	50	420	407	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+8	8_170_minus_field2	RmPerfLimitsOverride=138	yes	389	50	420	407	420	420	6.90	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+9	9_170_minus_field3	RmPerfLimitsOverride=42	yes	389	50	420	407	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+10	10_170_and_RatedTdp0	RmPerfLimitsOverride=170;RmPerfRatedTdpLimit=0	yes	389	50	420	407	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+11	11_170_and_DisableIntersect	RmPerfLimitsOverride=170;RMDisablePerfIntersect=1	yes	389	50	420	407	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
+12	12_170_and_ForceLocked	RmPerfLimitsOverride=170;RMForceLockedClocksMode=1	yes	390	50	420	408	420	420	6.93	0	P8	0x0000000000000000	power cap lifted but the card stays in P8 (420 MHz, memory 405 MHz)
