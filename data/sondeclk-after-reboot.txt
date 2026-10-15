@@ -1,0 +1,5 @@
+# sondeclk after a cold boot with the fix in the initramfs, 2026-10-15 16:2x (GPU 1 just after a 90 s load, so warm: ~58 C)
+NVIDIA GeForce RTX 3080: 68 SMs, compute capability 8.6, advertised max clock 1710 MHz, memory 9501 MHz on 320 bits, L2 5120 KiB
+launch 1: 0.252 s; real SM clock: mean 1756 MHz (min 1703, median 1770, max 1826); results checksum c1a800a176215af3
+launch 2: 0.236 s; real SM clock: mean 1947 MHz (min 1943, median 1948, max 1949); results checksum c1a800a176215af3
+launch 3: 0.235 s; real SM clock: mean 1950 MHz (min 1950, median 1950, max 1950); results checksum c1a800a176215af3

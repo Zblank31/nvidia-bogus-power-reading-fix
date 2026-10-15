@@ -8,6 +8,8 @@ J'ai acheté d'occasion une GALAX RTX 3080 LHR de 10 Go qui avait servi au minag
 >
 > English version: [README.en.md](README.en.md)
 
+> Mise à jour importante : après un vrai redémarrage, la fréquence réelle est ~1950 MHz (pas 1335) et la carte donne ~28 TFLOPS. À ce régime elle chauffe vite : 80 °C en 90 s de charge à fond, et ça monte encore, car sans la gestion de puissance le ventilateur n'est plus régulé. Le chiffre de 44 °C plus bas date d'un ancien test à 1335 MHz. Ne la laisse pas tourner à fond sans surveillance ni limite de fréquence (essai en cours, voir « Ce que ça coûte »).
+
 ## Le résumé
 
 Si ta carte, souvent d'occasion et ex-minage :

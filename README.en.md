@@ -8,6 +8,8 @@ I bought a second-hand GALAX RTX 3080 LHR 10 GB that had been used for mining. I
 >
 > Version française : [README.md](README.md)
 
+> Important update: after a real reboot the real clock is ~1950 MHz (not 1335) and the card does ~28 TFLOPS. At that pace it heats up fast: 80 C after 90 s at full load, and still climbing, because without the power management the fan is no longer regulated. The 44 C figure below comes from an older test at 1335 MHz. Do not leave it at full load unattended or without a clock limit (being tested, see "What it costs").
+
 ## In short
 
 If your card, often second-hand and ex-mining:
