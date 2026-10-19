@@ -105,6 +105,34 @@ Ma carte jumelle saine (une RTX 3080 Palit) fait 25 TFLOPS à 319 W, plafonnée 
 
 Les mesures brutes sont dans [`data/`](data/) et le détail de la recherche dans [`docs/comment-ca-marche.md`](docs/comment-ca-marche.md).
 
+### Brider la fréquence par sécurité
+
+Sans limite de puissance, la seule chose qui tient la carte, c'est ton flux d'air. Si le boîtier change ou si un ventilateur lâche, rien ne la freine avant les protections à 95 °C. J'ai donc plafonné la fréquence, ce qui ne touche pas au correctif :
+
+```bash
+sudo nvidia-smi -i 0 -lgc 210,1500     # essai ; pour annuler : sudo nvidia-smi -i 0 -rgc
+```
+
+Chez moi, avec 1500 MHz au lieu de ~1950 :
+
+| | Libre (~1950 MHz) | Bridé (1500 MHz) |
+|---|---|---|
+| Débit de calcul | ~27 TFLOPS | 18 à 22 TFLOPS |
+| Température après 75 s à fond | 68 °C | 42 à 51 °C |
+| Prise (tout le PC + écran, repos à 283 W) | 668 W | 500 W |
+| Carte seule (estimation, rendement ~90 %) | 330 à 345 W | 190 à 200 W |
+
+On perd environ un quart du débit, mais la consommation baisse de 40 % et la carte chauffe une vingtaine de degrés de moins : la tension baisse avec la fréquence. Les TFLOPS varient d'une passe à l'autre (18,4 à 21,8 chez moi) et je n'ai pas compris pourquoi.
+
+Le verrou saute au redémarrage et quand on recharge le pilote. Pour le remettre à chaque démarrage, `scripts/clock-cap.sh` installe un petit service systemd :
+
+```bash
+sudo ./scripts/clock-cap.sh --bus 0000:09:00.0 --max 1500    # avec --dry-run, il montre l'unité sans rien écrire
+sudo ./scripts/clock-cap.sh --remove                         # pour l'enlever
+```
+
+Comme le correctif, il est lié à l'adresse PCI : si tu changes la carte d'emplacement, refais la commande.
+
 ## 4. Ce que ça coûte
 
 La clé `RmPmgrPmuOverride=1` coupe, pour cette carte, la gestion de puissance que fait son PMU. Voilà ce que j'ai constaté :
@@ -113,7 +141,7 @@ La clé `RmPmgrPmuOverride=1` coupe, pour cette carte, la gestion de puissance q
 2. La lecture du ventilateur (`fan.speed`) renvoie « Unknown Error ». Mes ventilateurs tournent (je les entends) et la température est normale, mais je ne peux plus lire ni régler leur vitesse avec `nvidia-smi`.
 3. Les protections matérielles (ralentissement à 95 °C, arrêt à 98 °C) restent en place. Surveille quand même les températures les premières fois.
 4. N'applique pas ce correctif si la consommation affichée est réelle (voir le test de la prise), ni si tu soupçonnes un vrai défaut électrique.
-5. Pour borner la consommation, on peut sans doute verrouiller les horloges avec `nvidia-smi -lgc`. Je n'ai pas encore testé ça dans cet état.
+5. Pour borner la consommation et la chauffe, verrouille la fréquence maximale avec `nvidia-smi -lgc` : ça marche dans cet état, voir [« Brider la fréquence »](#brider-la-fréquence-par-sécurité).
 6. Le réglage est lié à l'adresse PCI. Si tu changes la carte de slot, refais-le avec `apply-fix.sh`.
 7. Une mise à jour du pilote peut changer le sens de la clé. Relance `verify.sh` après.
 8. Si la carte est encore sous garantie, un échange ou une réparation vaut mieux. Je n'ai pas ouvert la mienne : une cause matérielle est probable, mais pas prouvée.

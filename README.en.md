@@ -105,6 +105,34 @@ My healthy twin card (a Palit RTX 3080) does 25 TFLOPS at 319 W, held back by it
 
 Raw measurements are in [`data/`](data/) and the details of the research in [`docs/how-it-works.md`](docs/how-it-works.md).
 
+### Capping the clock as a safety net
+
+Without a power limit, the only thing holding the card back is your airflow. If the case changes or a fan gives up, nothing slows the card down before the protections at 95 °C. So I capped the clock, which does not touch the fix:
+
+```bash
+sudo nvidia-smi -i 0 -lgc 210,1500     # to try it; to undo: sudo nvidia-smi -i 0 -rgc
+```
+
+On my card, with 1500 MHz instead of ~1950:
+
+| | Free (~1950 MHz) | Capped (1500 MHz) |
+|---|---|---|
+| Compute throughput | ~27 TFLOPS | 18 to 22 TFLOPS |
+| Temperature after 75 s at full load | 68 °C | 42 to 51 °C |
+| Wall meter (whole PC + monitor, idle at 283 W) | 668 W | 500 W |
+| Card alone (estimate, ~90 % efficiency) | 330 to 345 W | 190 to 200 W |
+
+About a quarter of the throughput is lost, but the consumption drops by 40 % and the card runs some twenty degrees cooler: the voltage goes down with the clock. The TFLOPS vary from one run to the next (18.4 to 21.8 on my card) and I did not work out why.
+
+The lock is forgotten at reboot and when the driver is reloaded. To set it again at every boot, `scripts/clock-cap.sh` installs a small systemd service:
+
+```bash
+sudo ./scripts/clock-cap.sh --bus 0000:09:00.0 --max 1500    # with --dry-run it shows the unit without writing anything
+sudo ./scripts/clock-cap.sh --remove                         # to remove it
+```
+
+Like the fix, it is tied to the PCI address: if you move the card to another slot, run the command again.
+
 ## 4. What it costs
 
 The `RmPmgrPmuOverride=1` key switches off, for that card, the power management done by its PMU. This is what I observed:
@@ -113,7 +141,7 @@ The `RmPmgrPmuOverride=1` key switches off, for that card, the power management 
 2. The fan reading (`fan.speed`) returns "Unknown Error". My fans spin (I can hear them) and the temperature is normal, but I can no longer read or set their speed with `nvidia-smi`.
 3. The hardware protections (slowdown at 95 °C, shutdown at 98 °C) stay in place. Still, watch the temperatures the first times.
 4. Do not apply this fix if the displayed consumption is real (see the wall meter test), or if you suspect a real electrical fault.
-5. To bound the consumption you can probably lock the clocks with `nvidia-smi -lgc`. I have not tested that in this state yet.
+5. To bound the consumption and the heat, lock the maximum clock with `nvidia-smi -lgc`: it works in this state, see ["Capping the clock"](#capping-the-clock-as-a-safety-net).
 6. The setting is tied to the PCI address. If you move the card to another slot, redo it with `apply-fix.sh`.
 7. A driver update may change the meaning of the key. Run `verify.sh` again afterwards.
 8. If the card is still under warranty, an exchange or a repair is better. I did not open mine: a hardware cause is likely, but not proven.
