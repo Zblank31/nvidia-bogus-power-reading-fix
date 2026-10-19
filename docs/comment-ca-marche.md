@@ -33,7 +33,7 @@ Supposé, sans preuve :
 
 - L'origine est matérielle : un canal de mesure bloqué à fond d'échelle (≈ 393 W = 163,84 mV ÷ 5 mΩ × 12 V, la valeur constante observée). On n'a pas ouvert la carte.
 - La clé coupe la gestion de puissance du PMU. C'est ce que suggèrent son nom et ses effets (la lecture de puissance disparaît, le plafond aussi), pas une documentation.
-- La fréquence réelle plus basse (~1335 MHz) vient d'une tension qui n'est plus gérée. À vérifier.
+- (Corrigé) Nos premières mesures donnaient ~1335 MHz réels pour 1995 affichés. C'était un artefact du rechargement à chaud du pilote : après un vrai démarrage, la fréquence réelle (~1950 MHz) est égale à l'affichée.
 
 ## 3. Les clés de registre du pilote
 
@@ -124,7 +124,8 @@ Seule la valeur `1` a été essayée.
 | carte | affichée (nvidia-smi) | réelle (sondeclk) | TFLOPS | somme de contrôle des résultats |
 |---|---|---|---|---|
 | RTX 3080 Palit, saine (plafonnée à 319 W) | 1905-1920 MHz | 1917-1938 MHz | 25,0 | `c1a800a176215af3` |
-| RTX 3080 LHR corrigée | 1980-1995 MHz | 1335-1366 MHz | 19,4 | `c1a800a176215af3` |
+| RTX 3080 LHR corrigée, après rechargement à chaud (artefact) | 1980-1995 MHz | 1335-1366 MHz | 19,4 | `c1a800a176215af3` |
+| RTX 3080 LHR corrigée, après un vrai démarrage | 1950-1965 MHz | 1942-1950 MHz | ~27 | `c1a800a176215af3` |
 
 Les deux cartes calculent exactement la même chose (même somme de contrôle) : la carte corrigée est plus lente, pas fausse. Données : [`data/sondeclk-both-gpus.txt`](../data/sondeclk-both-gpus.txt).
 
@@ -132,10 +133,10 @@ Les deux cartes calculent exactement la même chose (même somme de contrôle) :
 
 | état | PC entier + écran |
 |---|---|
-| repos (deux cartes en P8, un navigateur ouvert) | 329 W |
-| carte corrigée à fond (19,3 TFLOPS) pendant 2 min | 515 W |
+| repos (deux cartes en P8, bureau ouvert) | 283 W |
+| carte corrigée à fond (~27 TFLOPS), 75 s | 668 W |
 
-Les 186 W de plus au mur font 150 à 170 W pour la carte (rendement de l'alimentation ~90 %, un cœur du processeur occupé par le test). Cela donne environ 115 GFLOPS/W, contre ~78 pour la carte saine (25 TFLOPS à 319 W).
+Les 385 W de plus au mur font 330 à 345 W pour la carte (rendement ~90 %, un cœur du processeur occupé par le test), soit sa puissance nominale. Cela donne environ 80 GFLOPS/W, comme la carte saine (25 TFLOPS à 319 W). (Une première mesure à 515 W, à 1335 MHz réels, date de l'artefact du rechargement à chaud.)
 
 ## 9. Reproduire et aller plus loin
 

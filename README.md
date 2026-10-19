@@ -8,7 +8,7 @@ J'ai acheté d'occasion une GALAX RTX 3080 LHR de 10 Go qui avait servi au minag
 >
 > English version: [README.en.md](README.en.md)
 
-> Mise à jour importante : après un vrai redémarrage, la fréquence réelle est ~1950 MHz (pas 1335) et la carte donne ~28 TFLOPS. À ce régime elle chauffe vite : 80 °C en 90 s de charge à fond, et ça monte encore, car sans la gestion de puissance le ventilateur n'est plus régulé. Le chiffre de 44 °C plus bas date d'un ancien test à 1335 MHz. Ne la laisse pas tourner à fond sans surveillance ni limite de fréquence (essai en cours, voir « Ce que ça coûte »).
+> Précision importante : sans gestion de puissance, le ventilateur n'est plus régulé. Chez moi, à fond, la carte consomme environ 330 W (sa puissance nominale) et monte à 68 °C en 75 s avec un bon flux d'air, mais elle était montée à 80 °C quand elle était mal placée. Assure-toi qu'elle est bien ventilée et surveille sa température les premières fois.
 
 ## Le résumé
 
@@ -25,7 +25,7 @@ alors elle croit consommer bien plus qu'elle ne le fait, et le firmware la bride
 options nvidia NVreg_RegistryDwordsPerDevice="pci=0000:09:00.0;RmPmgrPmuOverride=1;"
 ```
 
-Chez moi, la carte passe de 210 à 1995 MHz affichés et de 3,4 à 19,4 TFLOPS (×5,7). Elle monte à 44 °C au maximum après deux minutes à fond, et consomme environ 160 W d'après la prise.
+Chez moi, la carte passe de 210 à environ 1950 MHz et de 3,4 à environ 27 TFLOPS (×8). À fond, elle consomme environ 330 W d'après la prise, soit sa puissance nominale, et sa température plafonne vers 68 °C avec un bon flux d'air.
 
 ## 1. Est-ce ton cas ?
 
@@ -91,17 +91,17 @@ Pour revenir en arrière : `sudo ./scripts/remove-fix.sh`, puis redémarre.
 
 | | Avant | Après |
 |---|---|---|
-| Fréquence GPU affichée en charge | 210 MHz | 1995 MHz (1965 MHz à 44 °C) |
+| Fréquence GPU en charge (affichée = réelle) | 210 MHz | ~1950 MHz |
 | Fréquence mémoire en charge | 9251 MHz | 9251 MHz |
-| Débit de calcul (FP32 FMA, `tools/gpuload`) | 3,4 TFLOPS | 19,4 TFLOPS |
+| Débit de calcul (FP32 FMA, `tools/gpuload`) | 3,4 TFLOPS | ~27 TFLOPS |
 | Raison d'horloge | SW Power Cap | « Reliability » et « Board Limit » (bénignes) |
 | Puissance lue par `nvidia-smi` | ~395 W (fausse) | `N/A` |
-| Température (120 s à fond) | | 31 → 44 °C, la courbe s'aplatit |
-| Prise (tout le PC + écran) | | 329 W au repos, 515 W avec la carte à fond (+186 W) |
+| Température (75 s à fond, bon flux d'air) | | 38 → 68 °C, la courbe s'aplatit (80 °C atteints avec un mauvais placement) |
+| Prise (tout le PC + écran) | | 283 W au repos, 668 W avec la carte à fond (+385 W) |
 
-Avec un rendement d'alimentation d'environ 90 %, ces 186 W de plus à la prise font 150 à 170 W pour la carte, soit la moitié de ses 320 W nominaux.
+Avec un rendement d'alimentation d'environ 90 %, ces 385 W de plus à la prise font 330 à 345 W pour la carte (un cœur du processeur est aussi occupé par le test), soit sa puissance nominale de 320 W.
 
-Ma carte jumelle saine (une RTX 3080 Palit) fait 25 TFLOPS à 319 W. La carte corrigée en fait 77 %, pour à peu près la moitié de la puissance. L'écart a une explication curieuse, développée au [§7](#7-ce-quon-ne-sait-pas) : sa fréquence réelle n'est que de 1335 MHz environ, pas 1995.
+Ma carte jumelle saine (une RTX 3080 Palit) fait 25 TFLOPS à 319 W, plafonnée par sa limite de puissance. La carte corrigée n'a plus de limite : elle va un peu plus vite (~27 TFLOPS) pour la même consommation.
 
 Les mesures brutes sont dans [`data/`](data/) et le détail de la recherche dans [`docs/comment-ca-marche.md`](docs/comment-ca-marche.md).
 
@@ -109,7 +109,7 @@ Les mesures brutes sont dans [`data/`](data/) et le détail de la recherche dans
 
 La clé `RmPmgrPmuOverride=1` coupe, pour cette carte, la gestion de puissance que fait son PMU. Voilà ce que j'ai constaté :
 
-1. Plus de lecture de puissance (`power.draw` vaut `N/A`) et plus de limite de puissance : rien ne la bride si elle se met à trop consommer. Chez moi elle reste autour de 160 W, mais c'est à toi de surveiller, avec un wattmètre.
+1. Plus de lecture de puissance (`power.draw` vaut `N/A`) et plus de limite de puissance : rien ne la bride si elle se met à trop consommer. Chez moi elle va au bout de sa puissance nominale, autour de 330 W, et c'est à toi de surveiller, avec un wattmètre.
 2. La lecture du ventilateur (`fan.speed`) renvoie « Unknown Error ». Mes ventilateurs tournent (je les entends) et la température est normale, mais je ne peux plus lire ni régler leur vitesse avec `nvidia-smi`.
 3. Les protections matérielles (ralentissement à 95 °C, arrêt à 98 °C) restent en place. Surveille quand même les températures les premières fois.
 4. N'applique pas ce correctif si la consommation affichée est réelle (voir le test de la prise), ni si tu soupçonnes un vrai défaut électrique.
@@ -141,7 +141,7 @@ L'histoire complète, le tableau de tous les essais et ce qu'on sait du mécanis
 
 ## 7. Ce qu'on ne sait pas
 
-- La fréquence réelle. `tools/sondeclk` compte les cycles des SM pendant un intervalle de l'horloge globale. Ma carte saine délivre 1917-1938 MHz pour 1905-1920 affichés, mais la carte corrigée seulement 1335 MHz environ pour 1995 affichés. Les résultats de calcul sont pourtant identiques bit à bit sur les deux cartes. Notre hypothèse : sans la gestion de puissance, la tension n'est plus pilotée correctement et l'horloge adaptative se limite à ce que la tension permet. Un balayage de `nvidia-smi -lgc` avec `sondeclk` dirait si c'est une limite tension/fréquence ou un diviseur.
+- La fréquence réelle sur d'autres cartes ou d'autres pilotes. Chez moi, après un vrai démarrage, `tools/sondeclk` donne la même fréquence réelle que celle affichée (~1950 MHz). Attention : nos premières mesures, faites après un rechargement du pilote sans redémarrer, donnaient seulement ~1335 MHz pour 1995 affichés. C'était un artefact de ce rechargement à chaud : pour juger les fréquences, redémarre.
 - Les autres cartes. RTX 3060 Ti, 3070, 3080, 3090 ex-minage, autres familles : seul mon exemplaire est testé.
 - Les autres systèmes. Modules noyau propriétaires, autres versions du pilote, autres distributions : non testés. Sous Windows, on ne connaît pas d'équivalent.
 - Le canal en cause. Inspecter la carte (soudures et pistes autour des shunts de mesure, traces d'un « shunt mod » de l'ancien propriétaire) permettrait de localiser le défaut. Je ne l'ai pas fait.

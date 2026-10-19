@@ -10,6 +10,8 @@
 
 **Il ferme ton bureau** et tous les programmes qui utilisent les cartes, décharge le pilote, puis relance le bureau à la fin : il faudra te reconnecter. Enregistre ton travail avant. Lance-le détaché, en root, jamais depuis la session graphique. Si une carte ne revient pas après un rechargement, il faut redémarrer (ça n'est pas arrivé pendant les essais qui ont trouvé le correctif). Il a été écrit sur Ubuntu avec GNOME/GDM et `nvidia-persistenced` : lis le script avant de le lancer ailleurs. Il faut un affichage qui ne dépend pas de la carte testée.
 
+**Caveat / À savoir.** The real clock measured after a hot reload can be much lower than after a real boot (1335 vs ~1950 MHz on the card of this repository). Use this bench to find which option has an effect; confirm the performance after a reboot.
+
 ## Usage
 
 ```bash

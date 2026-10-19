@@ -8,7 +8,7 @@ I bought a second-hand GALAX RTX 3080 LHR 10 GB that had been used for mining. I
 >
 > Version française : [README.md](README.md)
 
-> Important update: after a real reboot the real clock is ~1950 MHz (not 1335) and the card does ~28 TFLOPS. At that pace it heats up fast: 80 C after 90 s at full load, and still climbing, because without the power management the fan is no longer regulated. The 44 C figure below comes from an older test at 1335 MHz. Do not leave it at full load unattended or without a clock limit (being tested, see "What it costs").
+> Important note: without the power management the fan is no longer regulated. On my card, at full load, it draws about 330 W (its rated power) and reaches 68 C in 75 s with good airflow, but it climbed to 80 C when badly placed. Make sure it is well ventilated and watch its temperature the first times.
 
 ## In short
 
@@ -25,7 +25,7 @@ then it believes it draws far more power than it does, and the firmware throttle
 options nvidia NVreg_RegistryDwordsPerDevice="pci=0000:09:00.0;RmPmgrPmuOverride=1;"
 ```
 
-On my card it goes from 210 to 1995 MHz displayed and from 3.4 to 19.4 TFLOPS (×5.7). It reaches 44 °C at most after two minutes at full load, and draws about 160 W according to the wall meter.
+On my card it goes from 210 to about 1950 MHz and from 3.4 to about 27 TFLOPS (×8). At full load it draws about 330 W according to the wall meter, which is its rated power, and its temperature levels off around 68 °C with good airflow.
 
 ## 1. Is this your case?
 
@@ -91,17 +91,17 @@ To undo: `sudo ./scripts/remove-fix.sh`, then reboot.
 
 | | Before | After |
 |---|---|---|
-| Displayed GPU clock under load | 210 MHz | 1995 MHz (1965 MHz at 44 °C) |
+| GPU clock under load (displayed = real) | 210 MHz | ~1950 MHz |
 | Memory clock under load | 9251 MHz | 9251 MHz |
-| Compute throughput (FP32 FMA, `tools/gpuload`) | 3.4 TFLOPS | 19.4 TFLOPS |
+| Compute throughput (FP32 FMA, `tools/gpuload`) | 3.4 TFLOPS | ~27 TFLOPS |
 | Clock event reason | SW Power Cap | "Reliability" and "Board Limit" (benign) |
 | Power read by `nvidia-smi` | ~395 W (bogus) | `N/A` |
-| Temperature (120 s at full load) | | 31 → 44 °C, the curve flattens |
-| Wall meter (whole PC + monitor) | | 329 W idle, 515 W with the card at full load (+186 W) |
+| Temperature (75 s at full load, good airflow) | | 38 → 68 °C, the curve flattens (80 °C reached when badly placed) |
+| Wall meter (whole PC + monitor) | | 283 W idle, 668 W with the card at full load (+385 W) |
 
-With a power-supply efficiency of about 90 %, those extra 186 W at the wall mean 150 to 170 W for the card, half of its 320 W rating.
+With a power-supply efficiency of about 90 %, those extra 385 W at the wall mean 330 to 345 W for the card (one CPU core is also busy with the test), which is its 320 W rated power.
 
-My healthy twin card (a Palit RTX 3080) does 25 TFLOPS at 319 W. The fixed card does 77 % of that for about half the power. The gap has a curious explanation, developed in [§7](#7-what-we-do-not-know): its real clock is only about 1335 MHz, not 1995.
+My healthy twin card (a Palit RTX 3080) does 25 TFLOPS at 319 W, held back by its power limit. The fixed card has no limit: it runs a little faster (~27 TFLOPS) for the same consumption.
 
 Raw measurements are in [`data/`](data/) and the details of the research in [`docs/how-it-works.md`](docs/how-it-works.md).
 
@@ -109,7 +109,7 @@ Raw measurements are in [`data/`](data/) and the details of the research in [`do
 
 The `RmPmgrPmuOverride=1` key switches off, for that card, the power management done by its PMU. This is what I observed:
 
-1. No more power reading (`power.draw` is `N/A`) and no more power limit: nothing throttles the card if it starts drawing too much. On my card it stays around 160 W, but watching it, with a wall meter, is up to you.
+1. No more power reading (`power.draw` is `N/A`) and no more power limit: nothing throttles the card if it starts drawing too much. On my card it goes to the end of its rated power, around 330 W, and watching it, with a wall meter, is up to you.
 2. The fan reading (`fan.speed`) returns "Unknown Error". My fans spin (I can hear them) and the temperature is normal, but I can no longer read or set their speed with `nvidia-smi`.
 3. The hardware protections (slowdown at 95 °C, shutdown at 98 °C) stay in place. Still, watch the temperatures the first times.
 4. Do not apply this fix if the displayed consumption is real (see the wall meter test), or if you suspect a real electrical fault.
@@ -141,7 +141,7 @@ The full story, the table of all trials and what is known about the mechanism: [
 
 ## 7. What we do not know
 
-- The real clock. `tools/sondeclk` counts the SMs' cycles over an interval of the global timer. My healthy card delivers 1917-1938 MHz for 1905-1920 displayed, but the fixed card only about 1335 MHz for 1995 displayed. The computation results are nevertheless bit-identical on both cards. Our hypothesis: without the power management the voltage is no longer driven properly and the adaptive clock limits itself to what the voltage allows. A sweep of `nvidia-smi -lgc` with `sondeclk` would tell whether it is a voltage/frequency limit or a divider.
+- The real clock on other cards or drivers. On my card, after a real boot, `tools/sondeclk` gives the same real clock as the displayed one (~1950 MHz). Beware: our first measurements, taken after reloading the driver without rebooting, gave only ~1335 MHz for 1995 displayed. That was an artefact of the hot reload: to judge clocks, reboot.
 - Other cards. Ex-mining RTX 3060 Ti, 3070, 3080, 3090, other families: only my card is tested.
 - Other systems. Proprietary kernel modules, other driver versions, other distributions: not tested. On Windows we know of no equivalent.
 - The faulty channel. Inspecting the card (solder joints and traces around the sense shunts, signs of a "shunt mod" by the previous owner) would locate the defect. I did not do it.

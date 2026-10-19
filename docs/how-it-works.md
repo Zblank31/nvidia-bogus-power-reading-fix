@@ -33,7 +33,7 @@ Assumed, without proof:
 
 - The origin is hardware: a sense channel stuck at full scale (≈ 393 W = 163.84 mV ÷ 5 mΩ × 12 V, the constant value observed). We did not open the card.
 - The key switches off the PMU's power management. That is what its name and its effects suggest (the power reading disappears, so does the cap), not documentation.
-- The lower real clock (~1335 MHz) comes from a voltage that is no longer managed. To be checked.
+- (Corrected) Our first measurements gave ~1335 MHz real for 1995 displayed. That was an artefact of hot-reloading the driver: after a real boot the real clock (~1950 MHz) equals the displayed one.
 
 ## 3. The driver's registry keys
 
@@ -124,7 +124,8 @@ Only the value `1` was tried.
 | card | displayed (nvidia-smi) | real (sondeclk) | TFLOPS | results checksum |
 |---|---|---|---|---|
 | Palit RTX 3080, healthy (capped at 319 W) | 1905-1920 MHz | 1917-1938 MHz | 25.0 | `c1a800a176215af3` |
-| Fixed RTX 3080 LHR | 1980-1995 MHz | 1335-1366 MHz | 19.4 | `c1a800a176215af3` |
+| Fixed RTX 3080 LHR, after a hot reload (artefact) | 1980-1995 MHz | 1335-1366 MHz | 19.4 | `c1a800a176215af3` |
+| Fixed RTX 3080 LHR, after a real boot | 1950-1965 MHz | 1942-1950 MHz | ~27 | `c1a800a176215af3` |
 
 Both cards compute exactly the same thing (same checksum): the fixed card is slower, not wrong. Data: [`data/sondeclk-both-gpus.txt`](../data/sondeclk-both-gpus.txt).
 
@@ -132,10 +133,10 @@ Both cards compute exactly the same thing (same checksum): the fixed card is slo
 
 | state | whole PC + monitor |
 |---|---|
-| idle (both cards in P8, a browser open) | 329 W |
-| fixed card at full load (19.3 TFLOPS) for 2 min | 515 W |
+| idle (both cards in P8, desktop open) | 283 W |
+| fixed card at full load (~27 TFLOPS), 75 s | 668 W |
 
-The extra 186 W at the wall make 150 to 170 W for the card (power-supply efficiency ~90 %, one CPU core busy with the test). That is about 115 GFLOPS/W, versus ~78 for the healthy card (25 TFLOPS at 319 W).
+The extra 385 W at the wall make 330 to 345 W for the card (efficiency ~90 %, one CPU core busy with the test), which is its rated power. That is about 80 GFLOPS/W, like the healthy card (25 TFLOPS at 319 W). (An earlier reading of 515 W, at 1335 MHz real, comes from the hot-reload artefact.)
 
 ## 9. Reproducing, and going further
 
